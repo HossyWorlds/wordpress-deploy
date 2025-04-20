@@ -1,43 +1,51 @@
 # WordPress Deploy 開発手順書
 
+## はじめに
+
 ちょっと早速脱線
 - 何かドキュメントを残したり手順書を残したいときは、individual配下にディレクトリを作ってgit管理してしまおう！
-Notionに書く場合との見極め
-Cursorエージェントと一緒に書くべきだと考えられるとき。コーティング要素が多かったり、壁打ちを前提としてドキュメントを残していきたいときなど。
+
+**Notionに書く場合との見極め**  
+Cursorエージェントと一緒に書くべきだと考えられるとき。コーディング要素が多かったり、壁打ちを前提としてドキュメントを残していきたいときなど。
 
 ## WordPress Google Click to Deploy
-参考: 
-- https://cloud.google.com/wordpress?hl=ja
-- https://www.topgate.co.jp/blog/google-service/10853
 
-### 1. Google Cloud プロジェクトで Google Cloud Marketplace と Compute Engine を有効にします。
+**参考リンク:**
+- [Google Cloud WordPress](https://cloud.google.com/wordpress?hl=ja)
+- [TopGate Blog - Google Service](https://www.topgate.co.jp/blog/google-service/10853)
 
-### 2. Cloud Marketplace で WordPress 仮想マシン（VM）を検索し、アプリケーションを起動します。
+### 手順
 
-   <img src="image/01_wordpress_marketplace_search.png" width="500">
-   <img src="image/02_wordpress_marketplace_search.png" width="500">
+#### 1. Google Cloud プロジェクトで Google Cloud Marketplace と Compute Engine を有効にします
 
-### 3. WordPress インスタンスを Compute Engine にデプロイします。
-   一番安いプランでこれ
-   <img src="image/03_wordpress_vm_budget.png" width="500">
-   <img src="image/04_wordpress_vm_deploy.png" width="500">
+#### 2. Cloud Marketplace で WordPress 仮想マシン（VM）を検索し、アプリケーションを起動します
 
-### 4. VM インスタンスに静的 IP アドレスを予約します。
+<img src="image/01_wordpress_marketplace_search.png" width="500">
+<img src="image/02_wordpress_marketplace_search.png" width="500">
 
-   <img src="image/05_wordpress_static_ip_reservation.png" width="500">
-   
-   -> この時点で外部IPを叩けばWordPressの画面にアクセス可能
-   http://外部静的IPアドレス
+#### 3. WordPress インスタンスを Compute Engine にデプロイします
 
-   <img src="image/06_wordpress_dashboard.png" width="500">
+一番安いプランでこれ
 
-   しかし、HTTPS通信を有効にする必要がある。
+<img src="image/03_wordpress_vm_budget.png" width="500">
+<img src="image/04_wordpress_vm_deploy.png" width="500">
 
-### HTTPS通信の実現方法
+#### 4. VM インスタンスに静的 IP アドレスを予約します
+
+<img src="image/05_wordpress_static_ip_reservation.png" width="500">
+
+> この時点で外部IPを叩けばWordPressの画面にアクセス可能  
+> `http://外部静的IPアドレス`
+
+<img src="image/06_wordpress_dashboard.png" width="500">
+
+しかし、HTTPS通信を有効にする必要があります。
+
+## HTTPS通信の実現方法
 
 セキュリティとSEO対策のため、WordPressサイトをHTTPS化する必要があります。以下に主な実現方法を紹介します。
 
-#### 選択肢1: WordPress VMに直接SSL証明書を設定
+### 選択肢1: WordPress VMに直接SSL証明書を設定
 
 **メリット**: 独立したHTTPSサイトとして運用できる  
 **難易度**: ★★☆
@@ -52,7 +60,7 @@ Cursorエージェントと一緒に書くべきだと考えられるとき。�
    ```
 4. WordPressの設定で、サイトURLをhttps://に変更
 
-#### 選択肢2: Google Cloud Load Balancerを使用
+### 選択肢2: Google Cloud Load Balancerを使用
 
 **メリット**: Googleのインフラを活用した堅牢な構成  
 **難易度**: ★★★
@@ -62,7 +70,7 @@ Cursorエージェントと一緒に書くべきだと考えられるとき。�
 3. バックエンドサービスとしてWordPress VMを指定
 4. DNSレコードをロードバランサーのIPに向ける
 
-#### 選択肢3: Vercelによるリバースプロキシ（推奨）
+### 選択肢3: Vercelによるリバースプロキシ（推奨）
 
 **メリット**: 設定が最もシンプル、既存サイトとの統合が容易  
 **難易度**: ★☆☆
@@ -90,7 +98,7 @@ Cursorエージェントと一緒に書くべきだと考えられるとき。�
 
 この方法では、ユーザーとの通信はVercelを通じて常にHTTPSで行われます。WordPressサーバー自体はHTTPのままですが、外部からは安全なHTTPSとして提供されます。
 
-#### 選択肢4: Nginx/Apacheリバースプロキシ
+### 選択肢4: Nginx/Apacheリバースプロキシ
 
 **メリット**: 完全なカスタマイズが可能  
 **難易度**: ★★★
